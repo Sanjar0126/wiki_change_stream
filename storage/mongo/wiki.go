@@ -76,7 +76,7 @@ func (f *wikiChangesStorage) Get(
 	return &response, nil
 }
 
-func (f *wikiChangesStorage) GetAll(ctx context.Context, page, limit int64, lang string) (
+func (f *wikiChangesStorage) GetAll(ctx context.Context, offset, limit int64, lang string) (
 	[]*models.WikiRecentChanges, int32, error) {
 	var (
 		response []*models.WikiRecentChanges
@@ -84,7 +84,8 @@ func (f *wikiChangesStorage) GetAll(ctx context.Context, page, limit int64, lang
 
 	opts := options.Find()
 	opts.SetLimit(limit)
-	opts.SetSkip((page - 1) * limit)
+	opts.SetSkip(offset)
+	opts.SetSort(bson.M{"timestamp": 1})
 
 	filtering := bson.M{"server_prefix": lang}
 

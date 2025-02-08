@@ -14,6 +14,6 @@ type WikiChangesI interface {
 	Create(ctx context.Context, req models.WikiRecentChanges) (string, error)
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (*models.WikiRecentChanges, error)
-	GetAll(ctx context.Context, page, limit int64, lang string) (
+	GetAll(ctx context.Context, offset, limit int64, lang string) (
 		[]*models.WikiRecentChanges, int32, error)
 }

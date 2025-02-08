@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/Sanjar0126/wiki_change_stream/config"
+	"github.com/Sanjar0126/wiki_change_stream/discord"
 	"github.com/Sanjar0126/wiki_change_stream/event"
 	"github.com/Sanjar0126/wiki_change_stream/models"
 	"github.com/Sanjar0126/wiki_change_stream/pkg/helper"
@@ -23,11 +24,11 @@ func processEvents[T any](ctx context.Context, storage storage.StorageI,
 	for {
 		select {
 		case <-ctx.Done():
-			log.Printf("Processor %d: Context cancelled, stopping processor")
+			log.Printf("Processor : Context cancelled, stopping processor")
 			return
 		case event, ok := <-eventChan:
 			if !ok {
-				log.Printf("Processor %d: Channel closed, stopping processor")
+				log.Printf("Processor : Channel closed, stopping processor")
 				return
 			}
 
@@ -41,7 +42,7 @@ func pushToDB(storage storage.StorageI, e models.WikiRecentChanges) {
 	_, err := storage.WikiChanges().Create(context.Background(), e)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
 }
 
@@ -69,6 +70,32 @@ func main() {
 	eventChan := make(chan models.WikiRecentChanges)
 	go processEvents(ctx, storageDB, eventChan, pushToDB, &wg)
 	go event.ConsumeEvents(ctx, config.EventStreamURL, eventChan, &wg)
+
+	discordHander := discord.NewHandler(&discord.HandlerOptions{
+		Config: &cfg,
+		DB:     storageDB,
+	})
+
+	discord := discord.NewDiscord(&cfg, discordHander)
+
+	wg.Add(1)
+
+	go func() {
+		defer wg.Done()
+
+		if err := discord.Open(); err != nil {
+			log.Printf("Error opening connection: %v", err)
+			cancel()
+
+			return
+		}
+
+		<-ctx.Done()
+
+		if err := discord.Close(); err != nil {
+			log.Printf("Error closing Discord connection: %v", err)
+		}
+	}()
 
 	sig := <-sigChan
 	log.Printf("Received signal: %v", sig)

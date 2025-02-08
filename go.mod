@@ -3,7 +3,9 @@ module github.com/Sanjar0126/wiki_change_stream
 go 1.22.1
 
 require (
+	github.com/bwmarrin/discordgo v0.28.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
@@ -15,5 +17,6 @@ require (
 	go.mongodb.org/mongo-driver v1.17.2 // indirect
 	golang.org/x/crypto v0.26.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 )

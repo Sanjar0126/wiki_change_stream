@@ -21,6 +21,7 @@ type Config struct {
 	DiscordAppID     string
 	DiscordPublicKey string
 	DiscordBotToken  string
+	DiscordChannelId string
 }
 
 func Load() Config {
@@ -47,6 +48,7 @@ func Load() Config {
 	config.DiscordAppID = cast.ToString(env("DISCORD_APP_ID", "YOUR_APP_ID"))
 	config.DiscordPublicKey = cast.ToString(env("DISCORD_PUBLIC_KEY", "YOUR_PUBLIC_KEY"))
 	config.DiscordBotToken = cast.ToString(env("DISCORD_BOT_TOKEN", "YOUR_BOT_TOKEN"))
+	config.DiscordChannelId = cast.ToString(env("DISCORD_CHANNEL_ID", "DISCORD_CHANNEL_ID"))
 
 	return config
 }

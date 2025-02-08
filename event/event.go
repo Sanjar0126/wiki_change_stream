@@ -14,6 +14,8 @@ func ConsumeEvents[T any](ctx context.Context, url string, eventChan chan<- T, w
 	defer wg.Done()
 	defer close(eventChan)
 
+	log.Println(url)
+
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 
