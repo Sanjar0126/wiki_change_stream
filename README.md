@@ -61,11 +61,11 @@ For storing wiki and discord user data mongodb is used.<db>
 For discord integration https://github.com/bwmarrin/discordgo library is used.<br>
 
 ## Design decisions and Trade-offs
-This project is built in monolith architecture for simplicity and time constraints. In order to add new event source, code modifications are required. 
-
-I would consider to split app into microservices and use message brokers or event streaming/processing tools. It would help to handle high-traffic services (like your Wikipedia consumer) separately without affecting others, push updates to one service without redeploying the entire app, failure in one service (e.g. Discord bot crash) won’t bring down the entire app, other parts of the system continue to function even if one microservice fails and also they work seamlessly with Docker & Kubernetes for automated deployments.
+This project is built in monolith architecture for simplicity and time constraints. However, the scaling of this application would require source code change and redeployment. For example, in order to add new event source, code modifications are required. This decision was because I don't have full requirement of business logic and future works. Also maintaining and writing monolithic applications much faster and easier.
 
 ## Scaling for higher loads
+I would consider to split app into microservices and use message brokers or event streaming/processing tools. For every event sources, there will be a microservice for consuming stream, parsing to schema and pushing to event stream. Another microservice will consume from unified event stream and write to the db. And another microservice for handling business logic and will only work with db. This will allow us abstract away event source handling implementation (but of course it should be carefully from business logic requirements). It would help to handle high-traffic services (like your Wikipedia consumer) separately without affecting others, push updates to one service without redeploying the entire app, failure in one service (e.g. Discord bot crash) won’t bring down the entire app, other parts of the system continue to function even if one microservice fails and also they work seamlessly with Docker & Kubernetes for automated deployments.
+
 I would use Stream Processing Framework<br>
 github.com/ThreeDotsLabs/watermill<br>
 Because it is easy to use, universal (messaging, stream processing, CQRS). It can be also used for integrating stream processing system something like Apache Kafka or Redis streams.<br>
