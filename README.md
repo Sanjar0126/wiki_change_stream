@@ -18,7 +18,7 @@ Commands:
 - !recent <offset> <limit>: Retrieves the most recent changes for the current language. Default offset=0, limit=10
 - !stats [yyyy-mm-dd]: Displays how many changes occurred on that date for the chosen language.
 
-##Workflow
+## Workflow
 Used programming language is Go.<br>
 For consuming eventsource standard go http client is used. Consuming function is run in goroutine and sends data to channel. Processing function receives data from channel and pushes to db.<br>
 For storing wiki and discord user data mongodb is used.<db>
