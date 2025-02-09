@@ -128,8 +128,6 @@ func consumeEventStream[T any](ctx context.Context, url string, eventChan chan<-
 					return fmt.Errorf("stream ended")
 				}
 
-				log.Printf("Error reading: %v", err)
-
 				if buffer.Len() > 0 {
 					if err := handleEvent(buffer.String(), eventChan); err != nil {
 						log.Printf("Error processing remaining buffer: %v", err)
@@ -138,7 +136,7 @@ func consumeEventStream[T any](ctx context.Context, url string, eventChan chan<-
 					buffer.Reset()
 				}
 
-				continue
+				return fmt.Errorf("error reading: %w", err)
 			}
 		}
 	}
