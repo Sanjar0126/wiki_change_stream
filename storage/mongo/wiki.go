@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -74,6 +75,22 @@ func (f *wikiChangesStorage) Get(
 	}
 
 	return &response, nil
+}
+
+func (f *wikiChangesStorage) GetLatest() string {
+	var (
+		response models.WikiRecentChanges
+	)
+
+	findOptions := options.FindOne().SetSort(bson.D{{"timestamp", -1}})
+
+	if err := f.collection.FindOne(
+		context.Background(),
+		bson.M{}, findOptions).Decode(&response); err != nil {
+		return ""
+	}
+
+	return fmt.Sprintf("%d", response.Timestamp)
 }
 
 func (f *wikiChangesStorage) GetAll(ctx context.Context, offset, limit int64, lang string) (

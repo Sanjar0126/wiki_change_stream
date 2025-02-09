@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"github.com/Sanjar0126/wiki_change_stream/config"
 	"github.com/Sanjar0126/wiki_change_stream/discord"
@@ -68,8 +69,20 @@ func main() {
 	defer cancel()
 
 	eventChan := make(chan models.WikiRecentChanges)
+
+	eventConfig := event.ConsumerConfig{
+		URL:            config.EventStreamURL,
+		ReconnectDelay: time.Second * 5,
+		GetLatestTimestamp: func() string {
+			return storageDB.WikiChanges().GetLatest()
+		},
+		MaxRetries: 3, // 0 for infinite retries
+	}
+
+	wg.Add(2)
+
 	go processEvents(ctx, storageDB, eventChan, pushToDB, &wg)
-	go event.ConsumeEvents(ctx, config.EventStreamURL, eventChan, &wg)
+	go event.ConsumeEvents(ctx, eventConfig, eventChan, &wg)
 
 	discordHander := discord.NewHandler(&discord.HandlerOptions{
 		Config: &cfg,
