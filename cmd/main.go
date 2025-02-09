@@ -40,11 +40,7 @@ func processEvents[T any](ctx context.Context, storage storage.StorageI,
 
 func pushToDB(storage storage.StorageI, e models.WikiRecentChanges) {
 	e.ServerPrefix = helper.GetPrefixFromServerName(e.ServerName)
-	_, err := storage.WikiChanges().Create(context.Background(), e)
-
-	if err != nil {
-		log.Println(err)
-	}
+	storage.WikiChanges().Create(context.Background(), e)
 }
 
 func main() {
@@ -76,7 +72,7 @@ func main() {
 		GetLatestTimestamp: func() string {
 			return storageDB.WikiChanges().GetLatest()
 		},
-		MaxRetries: 3, // 0 for infinite retries
+		MaxRetries: 0,
 	}
 
 	wg.Add(2)
