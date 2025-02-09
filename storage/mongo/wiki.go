@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -91,6 +92,34 @@ func (f *wikiChangesStorage) GetLatest() string {
 	}
 
 	return fmt.Sprintf("%d", response.Timestamp)
+}
+
+func (f *wikiChangesStorage) GetCountDate(dateStr, lang string) (int64, error) {
+	layout := "2006-01-02"
+
+	if lang == "" {
+		lang = "en"
+	}
+
+	date, err := time.Parse(layout, dateStr)
+	if err != nil {
+		return 0, err
+	}
+
+	startTimestamp := date.Unix()
+	endTimestamp := date.Add(24 * time.Hour).Add(-1 * time.Second).Unix()
+
+	filter := bson.M{
+		"server_prefix": lang,
+		"timestamp": bson.M{
+			"$gte": startTimestamp,
+			"$lte": endTimestamp,
+		},
+	}
+
+	count, err := f.collection.CountDocuments(context.Background(), filter)
+
+	return count, err
 }
 
 func (f *wikiChangesStorage) GetAll(ctx context.Context, offset, limit int64, lang string) (

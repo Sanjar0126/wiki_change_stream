@@ -13,7 +13,7 @@ func NewDiscord(cfg *config.Config, handler *Handler) *discordgo.Session {
 		log.Fatal("Error creating Discord session: ", err)
 	}
 
-	dg.AddHandler(handler.MessageCreate)
+	dg.AddHandler(handler.MessageHandle)
 	dg.AddHandler(handler.Ready)
 
 	return dg

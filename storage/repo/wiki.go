@@ -15,6 +15,7 @@ type WikiChangesI interface {
 	Delete(ctx context.Context, id string) error
 	Get(ctx context.Context, id string) (*models.WikiRecentChanges, error)
 	GetLatest() string
+	GetCountDate(dateStr, lang string) (int64, error)
 	GetAll(ctx context.Context, offset, limit int64, lang string) (
 		[]*models.WikiRecentChanges, int32, error)
 }
